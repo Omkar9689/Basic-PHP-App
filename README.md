@@ -1,7 +1,7 @@
 
 # Employee Management System (PHP MVC)
 
-A lightweight, clean Employee Registration System built using the **Model-View-Controller (MVC)** architecture. This project demonstrates basic CRUD operations, PDO for secure database interactions, and a responsive front-end design.
+A lightweight, clean Employee Registration System built using the **Model-View-Controller (MVC)** architecture. This project demonstrates basic DB connectivity and  operations, PDO for secure database interactions, and a responsive front-end design.
 
 ## 🚀 Features
 
@@ -22,16 +22,7 @@ A lightweight, clean Employee Registration System built using the **Model-View-C
 
 ```
 
----
 
-## 🛠️ Local Installation
-
-1. Clone the repository to your local server directory (e.g., `htdocs` or `var/www/html`).
-2. Import the `db.sql` file into your MySQL database.
-3. Update `config.php` with your local database credentials.
-4. Access the project via `http://localhost/employee_app`.
-
----
 
 ## ☁️ EC2 Deployment Guide
 
@@ -48,6 +39,7 @@ sudo apt update && sudo apt upgrade -y
 ```bash
 sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
 
+sudo systemctl start apache2 mysql
 ```
 
 
@@ -56,15 +48,20 @@ sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
 sudo mysql -u root
 # Run the SQL commands from db.sql here
 
+#Change native password to your custom password uing below  command
+#ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your-strong-pass';
+
 ```
+Use same pasword in your application to establish connection with database. 
 
 
 4. **Deploy Code:**
 ```bash
 cd /var/www/html
-sudo git clone https://github.com/your-username/employee_app.git .
+sudo git clone https://github.com/Omkar9689/Basic-PHP-App.git
 sudo chown -R www-data:www-data /var/www/html
 
+sudo systemctl restart apache2
 ```
 
 
@@ -73,22 +70,22 @@ sudo chown -R www-data:www-data /var/www/html
 
 1. **Update System:**
 ```bash
-sudo dnf update -y
+sudo yum update -y
 
 ```
 
 
-2. **Install LAMP Stack:**
+2. **Install LEMP Stack:**
 ```bash
-sudo dnf install -y httpd mariadb105-server php php-mysqlnd
+sudo yum install -y nginx mariadb105-server php php-mysqlnd
 
 ```
 
 
 3. **Start Services:**
 ```bash
-sudo systemctl start httpd
-sudo systemctl enable httpd
+sudo systemctl start nginx
+sudo systemctl enable nginx
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
@@ -98,7 +95,7 @@ sudo systemctl enable mariadb
 4. **Deploy Code:**
 ```bash
 cd /var/www/html
-sudo git clone https://github.com/your-username/employee_app.git .
+sudo git clone https://github.com/Omkar9689/Basic-PHP-App.git
 sudo chmod -R 755 /var/www/html
 
 ```
