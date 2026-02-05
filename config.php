@@ -2,7 +2,7 @@
 $host = 'localhost';
 $db   = 'employee_db';
 $user = 'root';
-$pass = ''; // Default XAMPP password is empty
+$pass = ''; // enter your mysql root password
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
