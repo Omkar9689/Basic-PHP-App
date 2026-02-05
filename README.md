@@ -100,6 +100,17 @@ sudo chmod -R 755 /var/www/html
 
 ```
 
+5. **Make changes in config files**
+```bash
+
+cd /etc/apache2/sites-available
+vi 000-default.conf
+#add DocumentRoot /var/www/html/Basic-PHP-App
+
+sudo systemctl restart apache2 
+
+```
+
 
 
 ---
