@@ -1,131 +1,211 @@
 
+
+---
+
 # Employee Management System (PHP MVC)
 
-A lightweight, clean Employee Registration System built using the **Model-View-Controller (MVC)** architecture. This project demonstrates basic DB connectivity and  operations, PDO for secure database interactions, and a responsive front-end design.
-
-## 🚀 Features
-
-* **MVC Architecture:** Separates business logic, data handling, and presentation.
-* **Secure:** Uses PDO prepared statements to prevent SQL Injection.
-* **Modern UI:** Clean, responsive interface built with CSS3.
-* **Dynamic List:** View registered employees instantly below the form.
-
-## 📂 Project Structure
-
-```text
-/employee_app
-│── config.php          # Database connection settings
-│── index.php           # Router & Controller logic
-│── model.php           # Data handling (SQL queries)
-│── view.php            # HTML/CSS UI template
-│── db.sql              # Database schema
-
-```
-
-
+---
 
 ## ☁️ EC2 Deployment Guide
 
-### Option 1: Ubuntu AMI (22.04 or 24.04 LTS)
+## Option 1: Ubuntu AMI (22.04 / 24.04 LTS)
 
-1. **Update System:**
+### 1️⃣ Update the System
+
 ```bash
 sudo apt update && sudo apt upgrade -y
-
 ```
 
+---
 
-2. **Install LAMP Stack:**
+### 2️⃣ Install LAMP Stack
+
 ```bash
-sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
+sudo apt install -y apache2 mysql-server php libapache2-mod-php php-mysql
+```
 
+Start and enable services:
+
+```bash
+sudo systemctl enable apache2 mysql
 sudo systemctl start apache2 mysql
 ```
 
+Verify Apache:
 
-3. **Setup Database:**
 ```bash
-sudo mysql -u root
-# Run the SQL commands from db.sql here
-
-#Change native password to your custom password uing below  command
-#ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your-strong-pass';
-
+http://<EC2-PUBLIC-IP>
 ```
-Use same pasword in your application to establish connection with database. 
 
+---
 
-4. **Deploy Code:**
+### 3️⃣ Configure MySQL
+
+```bash
+sudo mysql
+```
+
+Inside MySQL:
+
+```sql
+SOURCE /path/to/db.sql;
+ALTER USER 'root'@'localhost'
+IDENTIFIED WITH mysql_native_password BY 'your-strong-password';
+FLUSH PRIVILEGES;
+
+#run commands given in db.sql to create the database and tables
+
+EXIT;
+```
+
+➡️ **Use the same credentials in `config.php`**
+
+---
+
+### 4️⃣ Deploy Application Code
+
 ```bash
 cd /var/www/html
 sudo git clone https://github.com/Omkar9689/Basic-PHP-App.git
-sudo chown -R www-data:www-data /var/www/html
+sudo chown -R www-data:www-data Basic-PHP-App
+sudo chmod -R 755 Basic-PHP-App
+```
 
+---
+
+### 5️⃣ Configure Apache Virtual Host
+
+```bash
+sudo nano /etc/apache2/sites-available/000-default.conf
+```
+
+Update:
+
+```apache
+DocumentRoot /var/www/html/Basic-PHP-App
+```
+
+Restart Apache:
+
+```bash
 sudo systemctl restart apache2
 ```
 
+---
 
+### 6️⃣ Access the Application
 
-### Option 2: Amazon Linux 2023 AMI
+```
+http://<EC2-PUBLIC-IP>
+```
 
-1. **Update System:**
+---
+
+## Option 2: Amazon Linux 2023 AMI
+
+### 1️⃣ Update System
+
 ```bash
 sudo yum update -y
-
 ```
 
+---
 
-2. **Install LEMP Stack:**
+### 2️⃣ Install LEMP Stack
+
 ```bash
-sudo yum install -y nginx mariadb105-server php php-mysqlnd
-
+sudo yum install -y nginx mariadb105-server php php-mysqlnd git
 ```
 
+---
 
-3. **Start Services:**
+### 3️⃣ Start & Enable Services
+
 ```bash
-sudo systemctl start nginx
-sudo systemctl enable nginx
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
-
+sudo systemctl enable nginx mariadb
+sudo systemctl start nginx mariadb
 ```
 
+---
 
-4. **Deploy Code:**
+### 4️⃣ Configure Database
+
 ```bash
-cd /var/www/html
+sudo mysql
+```
+
+Inside MySQL:
+
+```sql
+SOURCE /path/to/db.sql;
+ALTER USER 'root'@'localhost'
+IDENTIFIED BY 'your-strong-password';
+FLUSH PRIVILEGES;
+
+#run commands given in db.sql to create the database and tables
+EXIT;
+```
+
+---
+
+### 5️⃣ Deploy Application Code
+
+```bash
+cd /usr/share/nginx
 sudo git clone https://github.com/Omkar9689/Basic-PHP-App.git
-sudo chmod -R 755 /var/www/html
-
+sudo chown -R nginx:nginx Basic-PHP-App
+sudo chmod -R 755 Basic-PHP-App
 ```
 
-5. **Make changes in config files**
+---
+
+### 6️⃣ Configure Nginx
+
 ```bash
-
-cd /etc/apache2/sites-available
-vi 000-default.conf
-#add DocumentRoot /var/www/html/Basic-PHP-App
-
-sudo systemctl restart apache2 
-
+sudo nano /etc/nginx/nginx.conf
 ```
 
+Inside `server` block:
 
+```nginx
+root /usr/share/nginx/Basic-PHP-App;
+index index.php index.html;
+
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+
+location ~ \.php$ {
+    include fastcgi_params;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+}
+```
+
+Restart services:
+
+```bash
+sudo systemctl restart nginx php-fpm
+```
 
 ---
 
-## 🔒 Security Group Configuration
+### 7️⃣ Access the Application
 
-To access the app via your browser, ensure your EC2 Security Group has the following inbound rules:
-
-| Type | Protocol | Port Range | Source |
-| --- | --- | --- | --- |
-| HTTP | TCP | 80 | 0.0.0.0/0 |
-| HTTPS | TCP | 443 | 0.0.0.0/0 |
-| SSH | TCP | 22 | Your IP |
+```
+http://<EC2-PUBLIC-IP>
+```
 
 ---
 
+## 🔒 Security Group Configuration (Required)
+
+| Type  | Protocol | Port | Source       |
+| ----- | -------- | ---- | ------------ |
+| HTTP  | TCP      | 80   | 0.0.0.0/0    |
+| HTTPS | TCP      | 443  | 0.0.0.0/0    |
+| SSH   | TCP      | 22   | Your IP only |
+
+---
 
 
